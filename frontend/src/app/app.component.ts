@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { StoryService, Story, StoryResponse } from './services/story.service';
 
 @Component({
@@ -11,6 +14,8 @@ import { StoryService, Story, StoryResponse } from './services/story.service';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
+  private searchSubject = new Subject<string>();
+
   Math = Math;
   stories: Story[] = [];
   loading = true;
@@ -26,10 +31,38 @@ export class AppComponent implements OnInit {
   searchQuery = '';
   sortBy: 'date' | 'score' = 'date';
 
-  constructor(private storyService: StoryService) {}
+  constructor(private storyService: StoryService, private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit() {
-    this.loadStories();
+    this.route.queryParams.subscribe(params => {
+      this.currentPage = +(params['page'] || 1);
+      this.searchQuery = params['search'] || '';
+      this.sortBy = params['sortBy'] || 'date';
+
+      this.loadStories();
+    });
+
+    // this ensures the fillable field to search awaits 400 milliseconds to automatically search without waiting for ENTER or pressing Search
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(query => {
+      this.searchQuery = query;
+      this.currentPage = 1;
+      this.loadStories();
+    });
+  }
+
+  onSearchChange(query: string) {
+    this.searchSubject.next(query);
+
+    this.router.navigate([], {
+      queryParams: {
+        search: query || null,
+        page: 1
+      },
+      queryParamsHandling: 'merge'
+    });
   }
 
   loadStories() {
@@ -50,6 +83,23 @@ export class AppComponent implements OnInit {
     });
   }
 
+  clearSearch() {
+    this.searchQuery = '';
+    this.sortBy = 'date';
+    this.currentPage = 1;
+
+    this.router.navigate([], {
+      queryParams: {
+        search: null,
+        page: 1,
+        sortBy: 'date'
+      },
+      queryParamsHandling: 'merge'
+    });
+
+    this.loadStories();
+  }
+
   onSearch(query: string) {
     this.searchQuery = query;
     this.currentPage = 1; // Reset to first page when searching
@@ -58,16 +108,35 @@ export class AppComponent implements OnInit {
 
   onSortChange(sortBy: 'date' | 'score') {
     this.sortBy = sortBy;
-    this.currentPage = 1; // Reset to first page when changing sort
+    this.currentPage = 1;
+
+    this.router.navigate([], {
+      queryParams: {
+        sortBy,
+        page: 1
+      },
+      queryParamsHandling: 'merge'
+    });
+
     this.loadStories();
   }
 
   goToPage(page: number) {
-    if (page < 1 || page > this.totalPages) return;
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
 
-    this.currentPage = page;
-    this.loadStories();
-    window.scrollTo(0, 0); // Scroll to top
+      this.router.navigate([], {
+        queryParams: {
+          page: this.currentPage,
+          search: this.searchQuery || null,
+          sortBy: this.sortBy
+        },
+        queryParamsHandling: 'merge'
+      });
+
+      this.loadStories();
+      window.scrollTo(0, 0);
+    }
   }
 
   nextPage() {

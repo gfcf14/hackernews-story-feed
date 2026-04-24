@@ -11,13 +11,14 @@
         type="text" 
         placeholder="Search stories by title..." 
         [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange($event)"
         (keyup.enter)="onSearch(searchQuery)"
         class="search-input"
       />
       <button (click)="onSearch(searchQuery)" class="search-btn">Search</button>
       <button 
         *ngIf="searchQuery" 
-        (click)="onSearch('')" 
+        (click)="clearSearch()" 
         class="clear-btn"
       >Clear</button>
     </div>
@@ -94,7 +95,7 @@
       [disabled]="currentPage === 1"
       class="pagination-btn"
     >
-      ← Previous
+      ← Prev
     </button>
 
     <div class="page-numbers">

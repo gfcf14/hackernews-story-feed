@@ -1,7 +1,6 @@
 using Xunit;
 using Moq;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
 using hackernews_api.Services;
 using hackernews_api.Models;
 

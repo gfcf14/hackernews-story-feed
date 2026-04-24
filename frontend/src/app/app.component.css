@@ -8,7 +8,7 @@
 header {
   text-align: center;
   margin-bottom: 2rem;
-  border-bottom: 2px solid #ff6600;
+  border-bottom: 2px solid #00b456;
   padding-bottom: 1rem;
 }
 
@@ -49,14 +49,14 @@ header p {
 
 .search-input:focus {
   outline: none;
-  border-color: #ff6600;
+  border-color: #00b456;
   box-shadow: 0 0 0 2px rgba(255, 102, 0, 0.1);
 }
 
 .search-btn,
 .clear-btn {
   padding: 0.75rem 1.5rem;
-  background-color: #ff6600;
+  background-color: #00b456;
   color: white;
   border: none;
   border-radius: 4px;
@@ -71,7 +71,7 @@ header p {
 }
 
 .search-btn:hover {
-  background-color: #e85d00;
+  background-color: #00ff00;
 }
 
 .clear-btn:hover {
@@ -105,7 +105,7 @@ header p {
 
 .sort-select:focus {
   outline: none;
-  border-color: #ff6600;
+  border-color: #00b456;
 }
 
 /* Loading & Error States */
@@ -155,6 +155,7 @@ header p {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  padding-bottom: 5rem;
 }
 
 .story-card {
@@ -165,8 +166,12 @@ header p {
 }
 
 .story-card:hover {
-  border-color: #ff6600;
+  background: #00b456;
+  border-color: #00b456;
   box-shadow: 0 2px 8px rgba(255, 102, 0, 0.15);
+}
+.story-card:hover a, .story-card:hover h2, .story-card:hover span {
+  color: #ffffff;
 }
 
 .story-header {
@@ -217,14 +222,14 @@ header p {
 
 .story-link {
   display: inline-block;
-  color: #ff6600;
+  color: #00b456;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
 }
 
 .story-link:hover {
-  color: #e85d00;
+  color: #00ff00;
   text-decoration: underline;
 }
 
@@ -246,7 +251,7 @@ header p {
 
 .pagination-btn {
   padding: 0.5rem 1rem;
-  background-color: #ff6600;
+  background-color: #00b456;
   color: white;
   border: none;
   border-radius: 4px;
@@ -256,7 +261,7 @@ header p {
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background-color: #e85d00;
+  background-color: #00ff00;
 }
 
 .pagination-btn:disabled {
@@ -282,14 +287,24 @@ header p {
 
 .page-btn:hover {
   background-color: #e0e0e0;
-  border-color: #ff6600;
+  border-color: #00b456;
 }
 
 .page-btn.active {
-  background-color: #ff6600;
+  background-color: #00b456;
   color: white;
-  border-color: #ff6600;
+  border-color: #00b456;
   font-weight: 600;
+}
+
+.pagination {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding: 1rem;
+  border-top: 1px solid #ddd;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 2;
 }
 
 /* Responsive Design */
@@ -326,10 +341,6 @@ header p {
     gap: 0.5rem;
   }
 
-  .pagination {
-    flex-direction: column;
-  }
-
   .page-numbers {
     flex-wrap: wrap;
     justify-content: center;
@@ -359,7 +370,7 @@ header p {
 
   .pagination-btn,
   .page-btn {
-    padding: 0.4rem 0.6rem;
+    padding: 0.4rem 0.4rem;
     font-size: 0.85rem;
   }
 }
