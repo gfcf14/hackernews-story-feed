@@ -4,23 +4,116 @@
     <p>Latest stories from the community</p>
   </header>
 
+  <!-- Search and Filter Section -->
+  <div class="controls-section">
+    <div class="search-box">
+      <input 
+        type="text" 
+        placeholder="Search stories by title..." 
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch(searchQuery)"
+        class="search-input"
+      />
+      <button (click)="onSearch(searchQuery)" class="search-btn">Search</button>
+      <button 
+        *ngIf="searchQuery" 
+        (click)="onSearch('')" 
+        class="clear-btn"
+      >Clear</button>
+    </div>
+
+    <div class="sort-controls">
+      <label>Sort by:</label>
+      <select [(ngModel)]="sortBy" (change)="onSortChange(sortBy)" class="sort-select">
+        <option value="date">Date (Newest)</option>
+        <option value="score">Score (Highest)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading State -->
   <div *ngIf="loading" class="loading">
     <p>Loading stories...</p>
   </div>
 
+  <!-- Error State -->
   <div *ngIf="error" class="error">
     <p>{{ error }}</p>
     <button (click)="loadStories()">Retry</button>
   </div>
 
+  <!-- Stories List -->
   <div *ngIf="!loading && !error" class="stories-list">
+    <div class="results-info">
+      <!-- <p *ngIf="totalCount > 0">
+        Showing <strong>{{ (currentPage - 1) * pageSize + 1 }}-{{ Math.min(currentPage * pageSize, totalCount) }}</strong> of <strong>{{ totalCount }}</strong> stories
+      </p> -->
+      <p *ngIf="totalCount > 0">
+        Showing 
+        <strong>
+          {{ (currentPage - 1) * pageSize + 1 }}-
+          {{ Math.min(currentPage * pageSize, totalCount) }}
+        </strong>
+        of <strong>{{ totalCount }}</strong> stories
+      </p>
+      <p *ngIf="totalCount === 0" class="no-results">No stories found. Try a different search.</p>
+    </div>
+
     <article *ngFor="let story of stories" class="story-card">
-      <h2>{{ story.title }}</h2>
+      <div class="story-header">
+        <h2>{{ story.title || 'Untitled story' }}</h2>
+        <span *ngIf="!hasUrl(story)" class="no-link-badge">No Link</span>
+      </div>
+
       <div class="story-meta">
         <span class="score">⬆️ {{ story.score }} points</span>
         <span class="comments">💬 {{ story.commentCount }} comments</span>
+        <span class="author" *ngIf="story.by">👤 {{ story.by }}</span>
+        <span class="time">⏱️ {{ formatDate(story.publishedAt) }}</span>
       </div>
-      <a [href]="story.url" target="_blank" class="story-link">Read more →</a>
+
+      <div class="story-link-container">
+        <a 
+          *ngIf="hasUrl(story) && story.url" 
+          [href]="story.url" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="story-link"
+        >
+          Read more →
+        </a>
+        <span *ngIf="!hasUrl(story)" class="no-link-text">(This story has no external link)</span>
+      </div>
     </article>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div *ngIf="!loading && !error && totalPages > 1" class="pagination">
+    <button 
+      (click)="previousPage()" 
+      [disabled]="currentPage === 1"
+      class="pagination-btn"
+    >
+      ← Previous
+    </button>
+
+    <div class="page-numbers">
+      <button 
+        *ngFor="let page of getPageNumbers()"
+        (click)="goToPage(page)"
+        [class.active]="page === currentPage"
+        class="page-btn"
+      >
+        {{ page }}
+      </button>
+    </div>
+
+    <button 
+      (click)="nextPage()" 
+      [disabled]="currentPage === totalPages"
+      class="pagination-btn"
+    >
+      Next →
+    </button>
   </div>
 </div>

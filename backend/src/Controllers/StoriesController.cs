@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using hackernews_api.Models;
+using hackernews_api.Services;
 
 namespace hackernews_api.Controllers;
 
@@ -7,60 +8,49 @@ namespace hackernews_api.Controllers;
 [Route("api/[controller]")]
 public class StoriesController : ControllerBase
 {
-    private static readonly List<Story> MockStories = new()
-    {
-        new Story 
-        { 
-            Id = 1, 
-            Title = "Show HN: Minimal Full-Stack Boilerplate", 
-            Url = "https://github.com", 
-            Score = 342, 
-            CommentCount = 48, 
-            PublishedAt = DateTime.UtcNow.AddHours(-2) 
-        },
-        new Story 
-        { 
-            Id = 2, 
-            Title = "The Art of Minimal Dependencies", 
-            Url = "https://github.com", 
-            Score = 256, 
-            CommentCount = 32, 
-            PublishedAt = DateTime.UtcNow.AddHours(-4) 
-        },
-        new Story 
-        { 
-            Id = 3, 
-            Title = ".NET 8 Released with New Features", 
-            Url = "https://github.com", 
-            Score = 512, 
-            CommentCount = 128, 
-            PublishedAt = DateTime.UtcNow.AddHours(-6) 
-        }
-    };
+    private readonly IStoryService _storyService;
+    private readonly ILogger<StoriesController> _logger;
 
-    [HttpGet]
-    public ActionResult<IEnumerable<Story>> GetStories()
+    public StoriesController(IStoryService storyService, ILogger<StoriesController> logger)
     {
-        return Ok(MockStories);
+        _storyService = storyService;
+        _logger = logger;
     }
 
+    /// <summary>
+    /// Get stories with optional search and pagination
+    /// </summary>
+    /// <param name="page">Page number (1-based), default 1</param>
+    /// <param name="pageSize">Number of stories per page, default 30, max 100</param>
+    /// <param name="search">Filter stories by title</param>
+    /// <param name="sortBy">Sort by "score" or "date", default "date"</param>
+    [HttpGet]
+    public async Task<ActionResult<StoryResponse>> GetStories(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 30,
+        [FromQuery] string? search = null,
+        [FromQuery] string sortBy = "date")
+    {
+        try
+        {
+            var result = await _storyService.GetStoriesAsync(page, pageSize, search, sortBy);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting stories");
+            return StatusCode(500, new { message = "Error retrieving stories", error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Get a single story by ID (from HackerNews API)
+    /// </summary>
     [HttpGet("{id}")]
     public ActionResult<Story> GetStory(int id)
     {
-        var story = MockStories.FirstOrDefault(s => s.Id == id);
-        if (story == null)
-            return NotFound();
-        
-        return Ok(story);
-    }
-
-    [HttpPost]
-    public ActionResult<Story> CreateStory(Story story)
-    {
-        story.Id = MockStories.Max(s => s.Id) + 1;
-        story.PublishedAt = DateTime.UtcNow;
-        MockStories.Add(story);
-        
-        return CreatedAtAction(nameof(GetStory), new { id = story.Id }, story);
+        // Individual story retrieval would require another service call
+        // For now, users can get stories from the list endpoint
+        return NotFound(new { message = "Use the list endpoint with pagination" });
     }
 }

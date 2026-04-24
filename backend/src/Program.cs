@@ -1,3 +1,5 @@
+using hackernews_api.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 var allowedOrigins = builder.Configuration["AllowedOrigins"]?.Split(",") ?? new[] { "http://localhost:4200" };
@@ -11,6 +13,19 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader();
     });
 });
+
+// Add memory cache
+builder.Services.AddMemoryCache();
+
+// Add HttpClient with timeout
+builder.Services.AddHttpClient<IHackerNewsClient, HackerNewsClient>()
+    .ConfigureHttpClient(client =>
+    {
+        client.Timeout = TimeSpan.FromSeconds(10);
+    });
+
+// Add services
+builder.Services.AddScoped<IStoryService, StoryService>();
 
 builder.Services.AddControllers();
 
