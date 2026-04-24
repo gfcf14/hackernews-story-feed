@@ -1,0 +1,26 @@
+<div class="container">
+  <header>
+    <h1>📰 Hacker News Stories</h1>
+    <p>Latest stories from the community</p>
+  </header>
+
+  <div *ngIf="loading" class="loading">
+    <p>Loading stories...</p>
+  </div>
+
+  <div *ngIf="error" class="error">
+    <p>{{ error }}</p>
+    <button (click)="loadStories()">Retry</button>
+  </div>
+
+  <div *ngIf="!loading && !error" class="stories-list">
+    <article *ngFor="let story of stories" class="story-card">
+      <h2>{{ story.title }}</h2>
+      <div class="story-meta">
+        <span class="score">⬆️ {{ story.score }} points</span>
+        <span class="comments">💬 {{ story.commentCount }} comments</span>
+      </div>
+      <a [href]="story.url" target="_blank" class="story-link">Read more →</a>
+    </article>
+  </div>
+</div>

@@ -1,0 +1,51 @@
+name: Build and Deploy to Azure
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Build frontend
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install frontend dependencies
+        run: cd frontend && npm ci
+
+      - name: Build Angular app
+        run: cd frontend && npm run build
+
+      # Copy frontend to backend
+      - name: Copy frontend to backend wwwroot
+        run: |
+          rm -rf backend/wwwroot
+          cp -r frontend/dist/hackernews-story-feed backend/wwwroot
+
+      # Setup .NET
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Publish backend
+      - name: Publish .NET backend
+        run: cd backend && dotnet publish -c Release -o ./publish
+
+      # Deploy to Azure
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_APPSERVICE_NAME }}
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+          package: backend/publish
