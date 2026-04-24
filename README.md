@@ -6,6 +6,10 @@ A minimal, full-stack boilerplate with **minimal dependencies**:
 
 Built with only essential packages — no bloat, just the core functionality you need.
 
+## Implementation Journey
+
+Since this README.md holds some basic setup info, I didn't want to mix it with the implementation steps I took to complete the assessment. Please refer to the file IMPLEMENTATION-JOURNEY.md to view my work process with different LLMs
+
 ## Quick Start (Local Development)
 
 ### 1. Start the Backend
@@ -100,30 +104,6 @@ hackernews-story-feed/
 - **@angular/router**: Routing (ready to expand)
 - **rxjs**: Reactive utilities
 - **zone.js**: Angular zone
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/stories` | Get all stories |
-| GET | `/api/stories/{id}` | Get a specific story |
-| POST | `/api/stories` | Create a new story |
-
-## Environment Configuration
-
-The app automatically uses the correct API URL:
-- **Local dev** (`npm start`): Backend at `http://localhost:5000`
-- **Production** (`npm run build`): Backend at same domain as frontend (via relative URLs)
-- **.NET runtime**: Reads `appsettings.json` (dev) or `appsettings.Production.json` (prod)
-
-No hardcoded URLs! ✅
-
-## Next Steps
-
-1. **Local Testing**: Run both backend and frontend locally to test
-2. **Push to GitHub**: `git push origin main`
-3. **Deploy to Azure**: Follow [AZURE_FREE_DEPLOYMENT.md](AZURE_FREE_DEPLOYMENT.md)
-4. **Expand**: Add database, authentication, more features
 
 ## License
 
